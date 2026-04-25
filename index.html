@@ -1,0 +1,161 @@
+```html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Mamadou Lamine">
+    <title>Générateur de CV Premium - Mamadou Lamine</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #3b82f6;
+            --text-dark: #0f172a;
+            --text-light: #64748b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #0f172a; display: flex; height: 100vh; overflow: hidden; }
+
+        .sidebar { width: 480px; background: #ffffff; padding: 25px; overflow-y: auto; box-shadow: 10px 0 30px rgba(0,0,0,0.5); z-index: 10; border-right: 5px solid var(--accent); }
+        h2 { color: var(--primary); font-size: 22px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 3px solid var(--accent); padding-bottom: 10px; }
+        
+        .input-group { margin-bottom: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        label { display: block; font-weight: 700; font-size: 12px; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
+        textarea { height: 80px; resize: none; }
+        
+        .hint { font-size: 11px; color: #64748b; margin-top: 5px; display: block; font-style: italic; border-left: 2px solid var(--accent); padding-left: 8px; }
+
+        .btn-download { width: 100%; padding: 18px; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 800; font-size: 16px; margin-top: 15px; transition: 0.3s; }
+        .btn-download:hover { background: #059669; transform: scale(1.02); }
+
+        .credits { margin-top: 25px; padding: 15px; background: var(--primary); color: white; border-radius: 8px; font-size: 12px; text-align: center; }
+
+        .preview-area { flex: 1; background: #1e293b; display: flex; justify-content: center; padding: 40px; overflow-y: auto; }
+        #cv-document { width: 210mm; min-height: 297mm; background: white; display: flex; box-shadow: 0 0 50px rgba(0,0,0,0.8); position: relative; }
+
+        .cv-aside { width: 35%; background: var(--primary); color: white; padding: 40px 25px; }
+        .cv-aside .photo-box { width: 110px; height: 110px; background: white; border-radius: 15px; margin: 0 auto 30px; display: flex; align-items: center; justify-content: center; font-size: 45px; border: 4px solid var(--accent); transform: rotate(-3deg); }
+        .cv-aside h3 { font-size: 14px; text-transform: uppercase; color: var(--accent); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; margin-bottom: 12px; margin-top: 25px; letter-spacing: 1px; }
+        .cv-aside p, .cv-aside div { font-size: 13px; line-height: 1.6; color: #cbd5e1; white-space: pre-line; }
+
+        .cv-body { width: 65%; padding: 50px 40px; color: var(--text-dark); }
+        .cv-header { margin-bottom: 40px; border-left: 8px solid var(--accent); padding-left: 20px; }
+        .cv-header h1 { font-size: 38px; font-weight: 900; line-height: 1; text-transform: uppercase; color: var(--primary); }
+        .cv-header h2 { font-size: 20px; color: var(--accent); border: none; margin-top: 10px; text-transform: uppercase; font-weight: 500; }
+
+        .cv-section { margin-bottom: 30px; }
+        .section-title { font-size: 16px; font-weight: 800; text-transform: uppercase; color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; margin-bottom: 15px; display: flex; align-items: center; }
+        .section-title::after { content: ""; flex: 1; height: 2px; background: #f1f5f9; margin-left: 15px; }
+        .section-content { font-size: 14.5px; line-height: 1.7; color: #334155; white-space: pre-line; text-align: justify; }
+
+        .footer-tag { position: absolute; bottom: 20px; right: 30px; font-size: 10px; color: #cbd5e1; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Premium CV Creator</h2>
+        <div class="input-group">
+            <label>Identité Complète</label>
+            <input type="text" id="inNom" placeholder="MAMADOU LAMINE NDIAYE" oninput="update()">
+        </div>
+        <div class="input-group">
+            <label>Titre du Poste</label>
+            <input type="text" id="inPoste" placeholder="CHEF DE PROJET / DESIGNER" oninput="update()">
+            <span class="hint">💡 Indiquez le métier que vous visez.</span>
+        </div>
+        <div class="input-group">
+            <label>Coordonnées & Réseaux</label>
+            <textarea id="inContact" oninput="update()" placeholder="📍 Dakar, Sénégal&#10;📞 +221 70 601 53 04&#10;📧 mail@example.com&#10;🔗 linkedin.com/in/lamine"></textarea>
+        </div>
+        <div class="input-group">
+            <label>Compétences Techniques</label>
+            <textarea id="inSkills" oninput="update()" placeholder="• Management d'équipe&#10;• Maîtrise Suite Office&#10;• Maintenance Réseau"></textarea>
+        </div>
+        <div class="input-group">
+            <label>Langues & Niveaux</label>
+            <input type="text" id="inLang" placeholder="Français (Courant), Anglais (Moyen), Wolof" oninput="update()">
+        </div>
+        <div class="input-group">
+            <label>Centres d'intérêt</label>
+            <input type="text" id="inLoisirs" placeholder="Football, Lecture, Nouvelles Technologies" oninput="update()">
+        </div>
+        <div class="input-group">
+            <label>Profil Professionnel</label>
+            <textarea id="inProfil" oninput="update()" placeholder="Professionnel rigoureux avec plus de 5 ans d'expérience dans..."></textarea>
+        </div>
+        <div class="input-group">
+            <label>Expériences Détaillées</label>
+            <textarea style="height: 120px;" id="inExp" oninput="update()" placeholder="2022 - 2024 : Responsable chez X&#10;- Gestion quotidienne de...&#10;- Optimisation des résultats de..."></textarea>
+        </div>
+        <div class="input-group">
+            <label>Formations & Diplômes</label>
+            <textarea id="inEd" oninput="update()" placeholder="2021 : Master en Management - Ecole X&#10;2019 : Licence Professionnelle"></textarea>
+        </div>
+        <button class="btn-download" onclick="download()">📥 GÉNÉRER MON CV PREMIUM (PDF)</button>
+        <div class="credits"><strong>Mamadou Lamine</strong><br>70 601 53 04</div>
+    </div>
+
+    <div class="preview-area">
+        <div id="cv-document">
+            <div class="cv-aside">
+                <div class="photo-box">👤</div>
+                <h3>Contact</h3>
+                <div id="outContact">Vos infos de contact...</div>
+                <h3>Compétences</h3>
+                <div id="outSkills">Vos expertises...</div>
+                <h3>Langues</h3>
+                <div id="outLang">Vos langues...</div>
+                <h3>Loisirs</h3>
+                <div id="outLoisirs">Vos passions...</div>
+            </div>
+            <div class="cv-body">
+                <div class="cv-header">
+                    <h1 id="outNom">NOM PRÉNOM</h1>
+                    <h2 id="outPoste">TITRE DU POSTE</h2>
+                </div>
+                <div class="cv-section">
+                    <div class="section-title">Profil</div>
+                    <div class="section-content" id="outProfil">Présentez ici votre parcours...</div>
+                </div>
+                <div class="cv-section">
+                    <div class="section-title">Expériences Professionnelles</div>
+                    <div class="section-content" id="outExp">Détaillez vos missions et résultats...</div>
+                </div>
+                <div class="cv-section">
+                    <div class="section-title">Formation académique</div>
+                    <div class="section-content" id="outEd">Listez vos diplômes...</div>
+                </div>
+            </div>
+            <div class="footer-tag">Propriété de l'application Mamadou Lamine</div>
+        </div>
+    </div>
+
+    <script>
+        function update() {
+            const list = ['Nom', 'Poste', 'Contact', 'Skills', 'Lang', 'Loisirs', 'Profil', 'Exp', 'Ed'];
+            list.forEach(id => {
+                const val = document.getElementById('in' + id).value;
+                const out = document.getElementById('out' + id);
+                if(val.trim() !== "") { out.innerText = val; }
+            });
+        }
+        function download() {
+            const element = document.getElementById('cv-document');
+            const name = document.getElementById('inNom').value || "CV";
+            html2pdf().set({
+                margin: 0,
+                filename: 'CV_PREMIUM_' + name.replace(/\s+/g, '_') + '.pdf',
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 3 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(element).save();
+        }
+    </script>
+</body>
+</html>
+```
